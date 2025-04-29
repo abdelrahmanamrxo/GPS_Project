@@ -1,5 +1,16 @@
 #include "tm4c123gh6pm.h"
 #include "GPIO.h"
+#include <stdbool.h>
+
+////////////// The following functions are used to initialize the GPIO ports ////////////// 
+
+/* 
+    Port A has A0, A1 for UART0 (RX, TX) enabled for serial communication with PC via debugger
+    Port B has B0, B1 for UART1 (RX, TX) enabled for serial communication with the GPS module
+    The Rest of port A and port B, as well as the rest of the ports are used for LCD interfacing
+    Port F is used for the RGB LED 
+
+*/
 
 void Init_PortA(void){
     SYSCTL_RCGCGPIO_R |= 0x01; // Enable clock for Port A
@@ -95,7 +106,10 @@ void Init_PortF(void){
     GPIO_PORTF_DIR_R = 0x0E; // Set direction for PF0-PF4 as output
 }
 
-void red_led(char state) {
+
+////////////// The following functions are to be used to test the RGB LED on Port F //////////////
+
+void red_led(bool state) {
     if (state) {
         GPIO_PORTF_DATA_R |= 0x02; // turn on red LED
     } else {
@@ -103,7 +117,7 @@ void red_led(char state) {
     }
 }
 
-void green_led(char state) {
+void green_led(bool state) {
     if (state) {
         GPIO_PORTF_DATA_R |= 0x08; // turn on green LED
     } else {
@@ -111,7 +125,7 @@ void green_led(char state) {
     }
 }
 
-void blue_led(char state) {
+void blue_led(bool state) {
     if (state) {
         GPIO_PORTF_DATA_R |= 0x04; // turn on blue LED
     } else {

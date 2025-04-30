@@ -1,8 +1,7 @@
 #include"tm4c123gh6pm.h"
-#include"UART.h"
 #include<stdbool.h>
-//////////////////////////////////////////////////////////////
 
+///////////////pin layout
 //RS-->PD0
 //RW-->PD1
 //EN-->PD2
@@ -24,28 +23,28 @@
 
 void printdata(unsigned char data){               // Sends byte to the LCD module through pins D0-->D7.
 
-    if( data & 0x01 == 0x01 ) GPIO_PORTB_DATA_R |= (1<<3); // Set PB3 if bit 0 of data is 1 (D0)
+    if( (data & 0x01) == 0x01 ) GPIO_PORTB_DATA_R |= (1<<3); // Set PB3 if bit 0 of data is 1 (D0)
     else GPIO_PORTB_DATA_R &=(~ (1<<3) );                  // Clear PB3 if bit 0 of data is 0
 
-    if( data & 0x02 == 0x02 ) GPIO_PORTC_DATA_R |= (1<<4); // Set PC4 if bit 1 of data is 1 (D1)
+    if( (data & 0x02) == 0x02 ) GPIO_PORTC_DATA_R |= (1<<4); // Set PC4 if bit 1 of data is 1 (D1)
     else GPIO_PORTC_DATA_R &=(~ (1<<4) );                  // Clear PC4 if bit 1 of data is 0
 
-    if( data & 0x04 == 0x04 ) GPIO_PORTC_DATA_R |= (1<<5); // Set PC5 if bit 2 of data is 1 (D2)
+    if( (data & 0x04) == 0x04 ) GPIO_PORTC_DATA_R |= (1<<5); // Set PC5 if bit 2 of data is 1 (D2)
     else GPIO_PORTC_DATA_R &=(~ (1<<5) );                  // Clear PC5 if bit 2 of data is 0
 
-    if( data & 0x08 == 0x08 ) GPIO_PORTC_DATA_R |= (1<<6); // Set PC6 if bit 3 of data is 1 (D3)
+    if( (data & 0x08) == 0x08 ) GPIO_PORTC_DATA_R |= (1<<6); // Set PC6 if bit 3 of data is 1 (D3)
     else GPIO_PORTC_DATA_R &=(~ (1<<6) );                  // Clear PC6 if bit 3 of data is 0
 
-    if( data & 0x10 == 0x10 ) GPIO_PORTC_DATA_R |= (1<<7); // Set PC7 if bit 4 of data is 1 (D4)
+    if( (data & 0x10) == 0x10 ) GPIO_PORTC_DATA_R |= (1<<7); // Set PC7 if bit 4 of data is 1 (D4)
     else GPIO_PORTC_DATA_R &=(~ (1<<7) );                  // Clear PC7 if bit 4 of data is 0
 
-    if( data & 0x20 == 0x20 ) GPIO_PORTD_DATA_R |= (1<<6); // Set PD6 if bit 5 of data is 1 (D5)
+    if( (data & 0x20) == 0x20 ) GPIO_PORTD_DATA_R |= (1<<6); // Set PD6 if bit 5 of data is 1 (D5)
     else GPIO_PORTD_DATA_R &=(~ (1<<6) );                  // Clear PD6 if bit 5 of data is 0
 
-    if( data & 0x40 == 0x40 ) GPIO_PORTD_DATA_R |= (1<<7); // Set PD7 if bit 6 of data is 1 (D6)
+    if( (data & 0x40) == 0x40 ) GPIO_PORTD_DATA_R |= (1<<7); // Set PD7 if bit 6 of data is 1 (D6)
     else GPIO_PORTD_DATA_R &=(~ (1<<7) );                  // Clear PD7 if bit 6 of data is 0
 
-    if( data & 0x80 == 0x80 ) GPIO_PORTF_DATA_R |= (1<<4); // Set PF4 if bit 7 of data is 1 (D7)
+    if( (data & 0x80) == 0x80 ) GPIO_PORTF_DATA_R |= (1<<4); // Set PF4 if bit 7 of data is 1 (D7)
     else GPIO_PORTF_DATA_R &=(~ (1<<4) );                  // Clear PF4 if bit 7 of data is 0
 
 
@@ -58,7 +57,7 @@ void LCD_DATA(unsigned char data){                //Sends a data byte to the LCD
     GPIO_PORTD_DATA_R |= (1<<0);  //RS=1
     GPIO_PORTD_DATA_R &= ~(1<<1); //RW=0
     printdata(data);                         //send an 8-bit data value to the LCD for display
-    for(int i=0;i<1000;i++);      //Delay
+    for(int i=0;i<1000;i++);      //Delay/////////////////////////////////////////////////////////////////////////////////////////////change
     GPIO_PORTD_DATA_R &= ~(1<<2); //EN=0
 
 
@@ -78,7 +77,7 @@ void LCD_cmd(unsigned char cmd){                  //Sends a command byte to the 
     GPIO_PORTD_DATA_R &= ~(1<<0); //RS=0
     GPIO_PORTD_DATA_R &= ~(1<<1); //RW=0
     printdata(cmd);                     //send an 8-bit command value to the LCD for execution
-    for(int i=0;i<1000;i++);      //Delay
+    for(int i=0;i<1000;i++);      //Delay/////////////////////////////////////////////////////////////////////////////////////////////change
     GPIO_PORTD_DATA_R &= ~(1<<2); //EN=0
 
 

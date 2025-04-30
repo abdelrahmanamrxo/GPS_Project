@@ -1,7 +1,7 @@
 #include"tm4c123gh6pm.h"
 #include"UART.h"
 #include<stdbool.h>
-
+//////////////////////////////////////////////////////////////
 
 //RS-->PD0
 //RW-->PD1

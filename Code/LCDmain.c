@@ -22,5 +22,5 @@ int main (void){
         // Main loop can be used for other tasks or to update the display
     }
 
-    return 0; // Return from main (not reached in this example)
+   
 }

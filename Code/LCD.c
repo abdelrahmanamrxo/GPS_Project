@@ -119,16 +119,3 @@ void LCD_int(void){                              // Initialize the LCD module
     LCD_cmd(0x80); // Set cursor position to first line, first column
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

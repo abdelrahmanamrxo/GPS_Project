@@ -1,6 +1,5 @@
-#ifndef LCD.h
-#define LCD.h
-
+#ifndef LCD_H
+#define LCD_H
 #include <stdbool.h>
 
 

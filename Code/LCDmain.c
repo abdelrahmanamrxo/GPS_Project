@@ -1,5 +1,7 @@
 #include"tm4c123gh6pm.h"
 #include"UART.h"
+#include"GPIO.h"
+
 #include<stdbool.h>
 
 

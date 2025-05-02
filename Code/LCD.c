@@ -1,5 +1,6 @@
 #include"tm4c123gh6pm.h"
 #include<stdbool.h>
+#include "SYSTICK.h"
 
 ///////////////pin layout
 //RS-->PD0
@@ -57,7 +58,7 @@ void LCD_DATA(unsigned char data){                //Sends a data byte to the LCD
     GPIO_PORTD_DATA_R |= (1<<0);  //RS=1
     GPIO_PORTD_DATA_R &= ~(1<<1); //RW=0
     printdata(data);                         //send an 8-bit data value to the LCD for display
-    for(int i=0;i<1000;i++);      //Delay/////////////////////////////////////////////////////////////////////////////////////////////change
+    delay(3);      //Delay/////////////////////////////////////////////////////////////////////////////////////////////change
     GPIO_PORTD_DATA_R &= ~(1<<2); //EN=0
 
 
@@ -77,7 +78,7 @@ void LCD_cmd(unsigned char cmd){                  //Sends a command byte to the 
     GPIO_PORTD_DATA_R &= ~(1<<0); //RS=0
     GPIO_PORTD_DATA_R &= ~(1<<1); //RW=0
     printdata(cmd);                     //send an 8-bit command value to the LCD for execution
-    for(int i=0;i<1000;i++);      //Delay/////////////////////////////////////////////////////////////////////////////////////////////change
+    delay(3);     //Delay/////////////////////////////////////////////////////////////////////////////////////////////change
     GPIO_PORTD_DATA_R &= ~(1<<2); //EN=0
 
 

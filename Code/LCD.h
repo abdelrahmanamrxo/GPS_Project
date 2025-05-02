@@ -1,7 +1,8 @@
 #ifndef LCD_H
 #define LCD_H
 #include <stdbool.h>
-
+#include "SYSTICK.h"
+#include "tm4c123gh6pm.h"
 
 void printdata(unsigned char data);// Sends a data byte to the LCD module through pins D0-->D7.
 

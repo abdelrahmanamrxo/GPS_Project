@@ -88,7 +88,9 @@ void LCD_cmd(unsigned char cmd){                  //Sends a command byte to the 
 }
 
 
-
+void LCD_clear_display(void){
+    LCD_cmd(0x01); // Clear display
+}
 
 
 void LCD_string(char *str , unsigned char len){   // Sends a string to the LCD module as data byte.
@@ -113,6 +115,9 @@ void LCD_int(void){                              // Initialize the LCD module
     LCD_cmd(0x06); // Entry mode set: increment cursor, no shift
     LCD_cmd(0x0C); // Display on, cursor off, blink off
     LCD_cmd(0x01); // Clear display
-    LCD_cmd(0x80); //
+    LCD_cmd(0x3C); // Activate second line
+    LCD_cmd(0x80); // Set cursor to the beginning of the first line
 
 }
+
+

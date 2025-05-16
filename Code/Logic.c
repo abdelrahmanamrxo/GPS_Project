@@ -5,19 +5,25 @@
 #include "LCD.h"
 #include <math.h>
 #include "GPIO.h"
+#include "UART.h"
+#include "Logic.h"
 #define EARTH_RADIUS_KM 6378.0f
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
-//  Constant places configurations (change with actual values)
-const float place_longitudes[5] = {3116.675537, 3116.707031,
-     3116.827148, 3116.811523, 3116.708984};
-const float place_latitudes[5]  = {3003.875732, 3003.819336,
+// Constant places configurations (change with actual values)
+const float place_longitudes[5] = {-3116.671387, -3116.707031,
+     -3116.827148, -3116.811523, -3116.708984};
+const float place_latitudes[5]  = {3003.870850, 3003.819336,
      3003.829102, 3003.906250, 3003.933350};
 
-//decleration of global values
+// Decleration of global values
 extern unsigned int min_index;
 extern float min_distance;
-exern bool start; 
+extern bool first_read_successful; 
+extern float latitude, longitude;
+
+// Decalration of first arrival flag
+bool first_arrival=false;
 
 
 //  Landmarks names (subject to change)
@@ -50,14 +56,18 @@ float to_radians(float degrees) {
 
 //  Haversine formula to calculate the distance between two points on the earth
 float calc_distance(float lon1, float lat1, float lon2, float lat2) {  
-    float dlat = to_radians(abs(convert_to_degrees(lat2) - convert_to_degrees(lat1)));  // Absolute Difference in Latitudes
-    float dlon = to_radians(abs(convert_to_degrees(lon2) - convert_to_degrees(lon1)));  // Absolute Difference in Longitudes
+    
+    float dlat = to_radians(absolute(convert_to_degrees(lat2) - convert_to_degrees(lat1)));  // Absolute Difference in Latitudes
+    float dlon = to_radians(absolute(convert_to_degrees(lon2) - convert_to_degrees(lon1)));  // Absolute Difference in Longitudes
+
 
     float a = sinf(dlat / 2.0f) * sinf(dlat / 2.0f) +              //sin^2(dlat/2)
               cosf(to_radians(lat1)) * cosf(to_radians(lat2)) *    //cos(lat1)*cos(lat2)
               sinf(dlon / 2.0f) * sinf(dlon / 2.0f);               //sin^2(dlon/2)
                  
     float c = 2.0f * atanf(sqrtf(a) / sqrtf(1.0f - a));
+
+
     return EARTH_RADIUS_KM * c *1000.0f;  // Distance in meters
 }
 
@@ -66,9 +76,14 @@ float calc_distance(float lon1, float lat1, float lon2, float lat2) {
 //  Find Nearest Landmark and the Index of it
 void find_nearest_place_index(float lon, float lat) {
     float d;
-	  unsigned int i;
+	unsigned int i;
+    
+    min_distance = calc_distance(lon, lat, place_longitudes[0], place_latitudes[0]);
+    min_index = 0;
+
     // loop through all Landmarks to find the nearest one
-    for(i = 0; i < ARRAY_SIZE(place_longitudes); i++){  
+
+    for(i = 1; i < ARRAY_SIZE(place_longitudes); i++){  
         d = calc_distance(lon, lat, place_longitudes[i], place_latitudes[i]);
         if (d < min_distance) {
             min_distance = d;
@@ -78,20 +93,26 @@ void find_nearest_place_index(float lon, float lat) {
 }
 
 //  Function to control LEDS based on distance
-void LED_State(float min_distance) {
-    float upp_threshold = 50.0f; // Upper threshold for distance
-    float low_threshold = 10.0f;  // Lower threshold for distance
+void LED_State(void) {
+    float upp_threshold = 25.0; // Upper threshold for distance
+    float low_threshold = 10.0;  // Lower threshold for distance
 
     // If the distance is less than 10m turn on the green LED
     if (min_distance<=low_threshold) 
     {
+        if (!first_arrival) // Check if this is the first arrival
+        {
+            first_arrival = true;
+            activate_buzzer(); // Activate the buzzer only once
+        }
         red_led(0); 
         blue_led(0);
-        green_led(1); 
-    }
+        green_led(1); // Keep the green LED on
+    } 
     // If the distance is between 10m AND 50m turn of the blue LED
-    else if (min_distance<upp_threshold && min_distance > low_threshold) 
+    else if ((min_distance<upp_threshold) && (min_distance >low_threshold)) 
     {
+        first_arrival=false;
         red_led(0); 
         blue_led(1);
         green_led(0); 
@@ -99,22 +120,59 @@ void LED_State(float min_distance) {
     // If the distance is greater than 50m turn on the red LED (worst case)
     else 
     {
+        first_arrival=false;
         red_led(1); 
         blue_led(0);
         green_led(0);
     }
-    min_distance = 100000000.0f; // Reset the minimum distance for the next calculation
 }
 
 //  Display on LCD 
-void Update_LCD(unsigned int min_index) {
-    if (start == true) { // Starting
-        LCD_string("Waiting", 7); // calls LCD_string function to display
+void Update_LCD(void) {
+    
+    LCD_clear_display();
+
+    if (first_read_successful == false) { // Starting
+        LCD_string("Waiting for GPS data...", 23); // calls LCD_string function to display
+    }
+    else {
+        LCD_string(place_names[min_index],(unsigned char)((place_name_lengths[min_index]))); // calls LCD_string function to display
+        LCD_cmd(0xC0);
+        LCD_string("Dst to: ", 8);
+        char min_distance_str[5]; // Buffer to store the string representation of the float
+        snprintf(min_distance_str, sizeof(min_distance_str), "%d", (int)min_distance); // Convert float to string with 2 decimal places
         
+        int number_length;
+        
+        if((int)min_distance>=100)
+            number_length=3;
+        else if((int)min_distance>=10)
+            number_length=2;
+        else
+            number_length=1;
+
+        LCD_string(min_distance_str, number_length);
     }
-    // add else if for lon and lat global variables to check 
-    // start = false; // Set start to false after the first display
-	else {
-        LCD_string(place_names[min_index],(unsigned char)((place_name_lengths[min_index])-1)); // calls LCD_string function to display
-    }
+}
+
+
+
+float absolute(float value){
+    if(value<0)
+        return -value;
+    return value;
+}
+
+void activate_buzzer(void){
+    buzzer(1); // Buzzer on
+    delay(500); // Delay for 1 second
+    buzzer(0); // Buzzer off
+    delay(500); // Delay for 1 second
+    buzzer(1); // Buzzer on
+    delay(500); // Delay for 1 second
+    buzzer(0); // Buzzer off
+    delay(500); // Delay for 1 second
+    buzzer(1); // Buzzer on
+    delay(500); // Delay for 1 second
+    buzzer(0); // Buzzer off
 }

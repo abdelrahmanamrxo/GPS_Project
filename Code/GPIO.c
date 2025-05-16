@@ -20,10 +20,11 @@ void Init_PortA(void){
     while((SYSCTL_PRUART_R & 0x01) == 0){}; // Wait for clock to be ready
 
     GPIO_PORTA_LOCK_R = 0x4C4F434B; // Unlock Port A
-    GPIO_PORTA_CR_R = 0x03; // Commit changes to PA0-PA1
+    GPIO_PORTA_CR_R = 0x07; // Commit changes to PA0-PA1
 
-    GPIO_PORTA_DEN_R = 0x03;  // Enable digital function for PA0-PA1
+    GPIO_PORTA_DEN_R = 0x07;  // Enable digital function for PA0-PA1
     GPIO_PORTA_DIR_R &= ~0x03; // Set PA0-PA1 as input/output as required by UART
+    GPIO_PORTA_DIR_R |= 0x04; // Set PA2 as output
 
     GPIO_PORTA_AMSEL_R = 0x00; // Disable analog function
     GPIO_PORTA_PCTL_R = 0x00000011; // Set PCTL for PA0-PA1 as UART (U0RX, U0TX)
@@ -148,5 +149,11 @@ void blue_led(bool state) {
     }
 }
 
-
+void buzzer(bool state) {
+    if (state) {
+        GPIO_PORTA_DATA_R |= 0x04; // turn on buzzer (PA2)
+    } else {
+        GPIO_PORTA_DATA_R &= ~0x04; // turn off buzzer (PA2)
+    }
+}
 

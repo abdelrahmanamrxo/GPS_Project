@@ -22,4 +22,9 @@ void UART1_sendChar(char data);
 void UART0_sendString(char *str);
 void UART1_sendString(char *str);
 
+// Special functions for debugging 
+
+void GPS_data_to_UART0(void);
+void UART0_printFloat(float value);
+
 #endif

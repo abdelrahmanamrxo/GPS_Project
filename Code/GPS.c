@@ -3,13 +3,15 @@
 #include<string.h>
 #include<stdlib.h>
 #include"GPS.h"
+#include "GPIO.h"
 
 // Define the variables declared as extern in GPS.h
-extern char *token; // Used to tokenize the GPS input array
-extern char GPS_input_array[50]; // Array to store GPS input data
-extern char GPS_LOGNAME[]; // Log name for GPS data
-extern char GPS_2D[12][20]; // 2D array to store parsed GPS data
+char *token; // Used to tokenize the GPS input array
+char GPS_input_array[50]; // Array to store GPS input data
+char GPS_LOGNAME[] = "$GPRMC,"; // Log name for GPS data
+char GPS_2D[12][20]; // 2D array to store parsed GPS data
 extern float latitude, longitude; // Latitude and longitude values
+bool first_read_successful=false;
 
 // there is problem happened in video cause of memory but i do not change code untill it gives error
 // when you run need to define main()****
@@ -36,6 +38,7 @@ void GPS_READ()
 			}
 	}while(flag==0);
 
+
 	//make sure that array do not contain rubbish
 	strcpy(GPS_input_array,"");
 	
@@ -44,8 +47,13 @@ void GPS_READ()
 			recieved_char=UART1_getChar();
 			GPS_input_array[counter]=recieved_char;
 			counter ++;
-	}while(recieved_char!='E'); // I try to take only needed information from Gps to save storage *difference* 
 
+			if(recieved_char=='V')// check if the end of the string is reached
+			{
+				break;
+			}
+
+	}while(recieved_char!='E'); // I try to take only needed information from Gps to save storage *difference* 
 
 }
 
@@ -70,6 +78,7 @@ void GPS_format(){
 
 	if (strcmp(GPS_2D[1],"A")==0)
 		{
+			first_read_successful = true;
 			if (strcmp(GPS_2D[3],"N")==0)
 			{
 				latitude=atof(GPS_2D[2]);

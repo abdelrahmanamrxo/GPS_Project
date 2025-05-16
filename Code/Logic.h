@@ -12,9 +12,19 @@ float calc_distance(float lon1, float lat1, float lon2, float lat2);
 void find_nearest_place_index(float lon, float lat);
 
 //  Function to control LEDS based on distance    
-void LED_State(double min_distance);
+void LED_State(void);
 
 //  Function to update the LCD with the nearest place
-void Update_LCD(unsigned int min_index);
+void Update_LCD(void);
+
+// Find absolute of float value
+
+float absolute(float value);
+
+// Activate the buzzer
+void activate_buzzer(void);
+
+// Converts to standard degrees
+float convert_to_degrees(float angle);
 
 #endif

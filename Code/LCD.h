@@ -15,6 +15,8 @@ void LCD_string(char *str , unsigned char len);// Sends a string to the LCD modu
 
 void LCD_int(void);// Initializes the LCD module.
 
+void LCD_clear_display(void); // Clears the display
+
 
 #endif
 
